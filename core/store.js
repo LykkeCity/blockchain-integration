@@ -19,6 +19,10 @@ class MongoStore {
 		return this.client ? this.client.close() : Promise.resolve();
 	}
 
+	oid () {
+		return ObjectId.apply(driver, arguments);
+	}
+
 	reconnect () {
 		if (this.client) {
 			this.close();
@@ -32,7 +36,7 @@ class MongoStore {
 				this.connectPromise = null;
 
 				this.client = client;
-				this.db = client.db(this.CFG.store.split('/').pop());
+				this.db = client.db(require('url').parse(this.CFG.store).pathname.substr(1));
 
 				this.Accounts = this.db.collection('accounts');
 				this.Transactions = this.db.collection('transactions');
@@ -119,6 +123,8 @@ class MongoStore {
 				opid: 1, 
 				timestamp: 1, 
 				hash: 1, 
+				bounce: 1,
+				bounced: 1,
 				from: '$operations.from', 
 				sourcePaymentId: '$operations.sourcePaymentId',
 				to: '$operations.to',
@@ -226,7 +232,7 @@ class MongoStore {
 
 	delete (collection, id) {
 		this.log.debug(`DELETE ${collection.s.name}: ${JSON.stringify(id)}`);
-		return collection.deleteOne(typeof id === 'string' && !(id instanceof ObjectId) ? {_id: id} : id).then(d => d.deletedCount, e => {
+		return collection.deleteOne(typeof id === 'string' || (id instanceof ObjectId) ? {_id: id} : id).then(d => d.deletedCount, e => {
 			this.log.error(e, 'Error in DELETE');
 		});
 	}
