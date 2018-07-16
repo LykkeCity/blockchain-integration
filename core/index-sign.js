@@ -37,7 +37,9 @@ let API_ROUTES = {
 			}
 
 			ctx.validateBody('WalletAddress').required('is required').isString('must be a string');
-			ctx.validateBody('WalletPrivateKey').required('is required').isString('must be a string');
+			if (Wallet.PRIVATE_KEY_NEEDED) {
+				ctx.validateBody('WalletPrivateKey').required('is required').isString('must be a string');
+			}
 			if (Wallet.VIEWKEY_NEEDED) {
 				ctx.validateBody('WalletViewKey').required('is required').isString('must be a string');
 			}
@@ -56,7 +58,7 @@ let API_ROUTES = {
 			
 			let address = wallet.addressCreate(ctx.vals.paymentId || undefined);
 			ctx.body = {
-				privateKey: PK,
+				privateKey: PK || DUMMY_PRIVATE_KEY,
 				publicAddress: address
 			};
 		},
@@ -80,7 +82,7 @@ let API_ROUTES = {
 				// wallet = new Wallet(CFG.testnet, null, SRV.log('sign-wallet'), () => {});
 				// await wallet.initSignWallet(AD, ctx.vals.privateKeys[0]);
 
-				let result = wallet.signTransaction(ctx.vals.transactionContext);
+				let result = wallet.signTransaction(ctx.vals.transactionContext, ctx.vals.privateKeys[0]);
 				if (result.error) {
 					throw result.error;
 				}
@@ -138,8 +140,7 @@ const index = (settings, routes, WalletClass) => {
 			wallet = new Wallet(CFG.testnet, null, SRV.log('sign-wallet'), () => {});
 			return wallet.initSignWallet(AD, PK);
 		};
-		if ((CFG.WalletAddress && CFG.WalletPrivateKey) ||
-			(process.env.WalletAddress && process.env.WalletPrivateKey)) {
+		if ((CFG.WalletAddress || process.env.WalletAddress) && ((CFG.WalletPrivateKey || process.env.WalletPrivateKey) || !Wallet.PRIVATE_KEY_NEEDED)) {
 			SRV.resetWallet();
 		}
 

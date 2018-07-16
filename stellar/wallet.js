@@ -401,6 +401,7 @@ XLMWallet.Tx = Wallet.Tx;
 XLMWallet.SEPARATOR = '+';
 XLMWallet.MANY_OUTPUTS = true;
 XLMWallet.EXTENSION_NAME = 'memo';
+XLMWallet.PRIVATE_KEY_NEEDED = true;
 
 
 module.exports = XLMWallet;
