@@ -1,5 +1,7 @@
 var CFG, SRV, log, Wallet, viewWallet;
 
+const DUMMY_PRIVATE_KEY = "dummy_private_key";
+
 /**
  * Some deffault routes for API service implemented according to one wallet scheme.
  * @type {Object}
@@ -27,7 +29,7 @@ let API_ROUTES = {
 			
 			let address = viewWallet.addressCreate(ctx.vals.paymentId || undefined);
 			ctx.body = {
-				privateKey: process.env.PrivateKey,
+				privateKey: DUMMY_PRIVATE_KEY,
 				publicAddress: address
 			};
 		},
