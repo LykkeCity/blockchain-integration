@@ -346,9 +346,17 @@ class XRPWallet extends Wallet {
 		}
 	}
 
-	signTransaction (data) {
+	signTransaction (data, secret) {
 		if (typeof data !== 'string') {
 			return {error: new Wallet.Error(Wallet.Errors.VALIDATION, 'signTransaction argument must be a string')};
+		}
+
+		if (!!secret) {
+			if (typeof secret !== 'string') {
+				return {error: new Wallet.Error(Wallet.Errors.VALIDATION, 'secret argument must be a string')};
+			}
+		} else if (!this.secret) {
+			return {error: new Wallet.Error(Wallet.Errors.EXCEPTION, 'no secret provided and wallet is not initialized with secret')};
 		}
 
 		if (!this.api) {
@@ -377,7 +385,7 @@ class XRPWallet extends Wallet {
 			}
 			data = Buffer.from(unsignedTransaction, 'base64').toString();
 
-			let signed = this.api.sign(data, this.secret);
+			let signed = this.api.sign(data, secret || this.secret);
 
 			this.log.debug(`tx signed in ${this.account}`);
 			return {signed: _id + XRPWallet.ENCODING_SEPARATOR + signed.id + XRPWallet.ENCODING_SEPARATOR + signed.signedTransaction};
@@ -588,5 +596,6 @@ XRPWallet.Tx = Wallet.Tx;
 XRPWallet.SEPARATOR = '+';
 XRPWallet.ENCODING_SEPARATOR = '$';
 XRPWallet.EXTENSION_NAME = 'tag';
+XRPWallet.PRIVATE_KEY_NEEDED = false;
 
 module.exports = XRPWallet;

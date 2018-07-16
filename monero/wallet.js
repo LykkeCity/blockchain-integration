@@ -550,6 +550,7 @@ XMRWallet.Errors = Wallet.Errors;
 XMRWallet.Account = Wallet.Account;
 XMRWallet.Tx = Wallet.Tx;
 XMRWallet.VIEWKEY_NEEDED = true;
+XMRWallet.PRIVATE_KEY_NEEDED = true;
 
 
 module.exports = XMRWallet;
