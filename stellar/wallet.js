@@ -1,9 +1,9 @@
 const StellarSdk = require('stellar-sdk'),
 	Wallet = require('../core/wallet.js'),
+	Transport = require('../core/transport.js'),
 	utils = require('../core/utils.js'),
 	Big = require('big.js'),
 	crypto = require('crypto'),
-	SEPARATOR = '+',	// separator for user addresses
 	PRECISION = 1e7,
 	DECIMALS = 7,
 	RESERVE = 1;
@@ -55,7 +55,7 @@ class XLMWallet extends Wallet {
 						}
 
 						// skip non-native operations
-						if (payment.asset_type !== 'native') {
+						if (payment.type !== 'create_account' && payment.asset_type !== 'native') {
 							return;
 						}
 
@@ -170,9 +170,9 @@ class XLMWallet extends Wallet {
 		return this.account;
 	}
 
-	addressDecode(str) {
+	static addressDecode(str) {
 		if (str) {
-			let [address, memo] = str.split(SEPARATOR);
+			let [address, memo] = str.split(XLMWallet.SEPARATOR);
 			if (address) {
 				try {
 					if (StellarSdk.StrKey.isValidEd25519PublicKey(address) && (!memo || memo.length === 28)) {
@@ -190,15 +190,15 @@ class XLMWallet extends Wallet {
 		}
 	}
 
-	addressEncode(address, paymentId) {
+	static addressEncode(address, paymentId) {
 		if (paymentId) {
-			return address + SEPARATOR + paymentId;
+			return address + XLMWallet.SEPARATOR + paymentId;
 		}
 		return address;
 	}
 
 	addressCreate (paymentId) {
-		return this.addressEncode(this.account, paymentId || crypto.randomBytes(14).toString('hex'));
+		return XLMWallet.addressEncode(this.account, paymentId || crypto.randomBytes(14).toString('hex'));
 	}
 
 	async createUnsignedTransaction (tx) {
@@ -355,7 +355,7 @@ class XLMWallet extends Wallet {
 	 * Just create random wallet
 	 * @return object with wallet data, should never fail
 	 */
-	createPaperWallet () {
+	static createPaperWallet () {
 		let keypair = StellarSdk.Keypair.random(),
 			ret = {
 				address: keypair.publicKey(),
@@ -363,6 +363,21 @@ class XLMWallet extends Wallet {
 			};
 
 		return ret;
+	}
+
+	static async createTestWallet () {
+		let wallet = XLMWallet.createPaperWallet();
+
+		let transport = new Transport({url: 'https://horizon-testnet.stellar.org/friendbot', retryPolicy: (error, attempts) => {
+			return error === 'timeout' || (error === null && attempts < 3);
+		}, conf: {timeout: 15000, headers: {accept: 'application/json'}}});
+
+		await transport.retriableRequest(null, 'GET', {addr: wallet.address});
+
+		return {
+			address: wallet.address,
+			seed: wallet.seed
+		};
 	}
 
 	/**
@@ -383,6 +398,9 @@ XLMWallet.Error = Wallet.Error;
 XLMWallet.Errors = Wallet.Errors;
 XLMWallet.Account = Wallet.Account;
 XLMWallet.Tx = Wallet.Tx;
+XLMWallet.SEPARATOR = '+';
+XLMWallet.MANY_OUTPUTS = true;
+XLMWallet.EXTENSION_NAME = 'memo';
 
 
 module.exports = XLMWallet;

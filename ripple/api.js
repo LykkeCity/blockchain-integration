@@ -2,15 +2,13 @@
 let init = () => {
 	return require('../core/index-api.js')(process.env.SettingsUrl, {
 		GET: {
-			/**
-			 * Overriding standard capabilities endpoint to return {@code areManyOutputsSupported = false}
-			 * @return {200 Object}
-			 */
-			'/api/capabilities': ctx => {
+			'/api/isalive': ctx => {
 				ctx.body = {
-					isTransactionsRebuildingSupported: false,
-					areManyInputsSupported: true,
-					areManyOutputsSupported: false
+					Name: "Lykke.Service.RippleApi",
+					Version: "1.0.0",
+	  				Env: process.env.ENV_INFO || null,
+	  				IsDebug: false,  
+	  				IssueIndicators: []
 				};
 			},
 		},

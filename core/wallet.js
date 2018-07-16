@@ -89,13 +89,22 @@ class Wallet {
 	}
 
 	/**
+	 * Returns current block number.
+	 * 
+	 * @return {Promise} which resolves to int balance
+	 */
+	currentBlock() {
+		throw new Error('Not implemented');
+	}
+
+	/**
 	 * Decode address from string. 
 	 *
 	 * @param {String} str 	address string
 	 * @return {Object} 	of {address: 'addr', paymentId: 'pid'} kind if succeeded
 	 * @return undeifned 	if argument is not a vaild address
 	 */
-	addressDecode(/* str */) {
+	static addressDecode(/* str, testnet */) {
 		throw new Error('Not implemented');
 	}
 
@@ -106,7 +115,7 @@ class Wallet {
 	 * @param {String} paymentId 	paymentId string
 	 * @return {String} 	of address encoded with paymentId in blockchain-specific format
 	 */
-	addressDecode(/* address, paymentId */) {
+	static addressEncode(/* address, paymentId, testnet */) {
 		throw new Error('Not implemented');
 	}
 
@@ -221,7 +230,7 @@ class Wallet {
 					this.log.debug(`Error in attempt ${err.message || JSON.stringify(err)}`);
 					let wait = rule(attempts);
 					if (wait === -1) {
-						this.log.error(err, `Error in attempt`);
+						this.log.error(err, 'Error in attempt');
 						reject(err);
 					} else {
 						setTimeout(attempt.bind(null, attempts + 1), wait * 1000);
