@@ -367,7 +367,7 @@ class XRPWallet extends Wallet {
 			if (data.indexOf(XRPWallet.ENCODING_SEPARATOR) === -1) {
 				try {
 					let txs = JSON.parse(Buffer.from(data, 'base64').toString()),
-						results = txs.map(tx => this.signTransaction(tx));
+						results = txs.map(tx => this.signTransaction(tx, secret));
 
 					return {signed: new Buffer(JSON.stringify(results.map(r => r.signed))).toString('base64')};
 				} catch (e) {
