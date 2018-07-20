@@ -241,6 +241,15 @@ class Wallet {
 			attempt(0);
 		});
 	}
+
+	/**
+	 * Checks if private key corresponds to address() value
+	 * 
+	 * @param {String} privateKey	Private key
+	 */
+	validatePrivateKey(/* privateKey */) {
+		return true;
+	}
 }
 
 /**

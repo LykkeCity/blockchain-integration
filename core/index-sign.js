@@ -70,6 +70,9 @@ let API_ROUTES = {
 
 			// DW => HW
 			if (ctx.vals.transactionContext === Wallet.Errors.NOPE_TX) {
+				if (ctx.vals.privateKeys.some(k => !wallet.validatePrivateKey(k))) {
+					throw new Wallet.Error(Wallet.Errors.VALIDATION, 'Invalid private key(s)');
+				}
 				ctx.body = {
 					signedTransaction: Wallet.Errors.NOPE_TX
 				};
