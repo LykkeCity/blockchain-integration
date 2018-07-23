@@ -17,7 +17,13 @@ let createTx = async (ctx, multipleInputs, multipleOutputs) => {
 	ctx.validateBody('operationId').required('is required').isGUID();
 	ctx.validateBody('assetId').required('is required').isString('must be a string').eq(CFG.assetId, 'must be equal to "' + CFG.assetId + '"');
 
-	let tx = new Wallet.Tx();
+	let tx = await ctx.store.tx({opid: ctx.vals.operationId});
+
+	if (tx && tx.status !== Wallet.Tx.Status.Initial) {
+		throw new ValidationError('conflict', `Operation ${ctx.vals.operationId} already ${tx.status}`);
+	}
+
+	tx = new Wallet.Tx();
 	tx.opid = ctx.vals.operationId;
 	if (multipleInputs) {
 		ctx.validateBody('toAddress').required('is required').isValidChainAddress();

@@ -98,6 +98,13 @@ const index = (settings, routes={}) => {
 								errorMessage: err.bouncer.message,
 								trace: err.stack
 							};
+						} else if (err.bouncer.key === 'conflict') {
+							ctx.status = 409;
+							ctx.body = {
+								errorCode: 'unknown',
+								errorMessage: err.bouncer.message,
+								trace: err.stack
+							};
 						} else if (err.bouncer.key) {
 							ctx.body = {
 								errorCode: 'unknown',
