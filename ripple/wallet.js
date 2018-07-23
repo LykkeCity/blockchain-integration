@@ -587,11 +587,16 @@ class XRPWallet extends Wallet {
 		};
 	}
 
-	validatePrivateKey(privateKey) {	
-		const pair = keyPairs.deriveKeypair(privateKey);
-		const addr = keyPairs.deriveAddress(pair.publicKey);
+	validatePrivateKey(privateKey) {
+		try {	
+			const pair = keyPairs.deriveKeypair(privateKey);
+			const addr = keyPairs.deriveAddress(pair.publicKey);
 
-		return addr === this.address();
+			return addr === this.address();
+		}
+		catch (e) {
+			return false;
+		}
 	}
 }
 
