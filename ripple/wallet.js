@@ -598,6 +598,15 @@ class XRPWallet extends Wallet {
 			return false;
 		}
 	}
+
+	validatePrivateKeyFormat(privateKey) {
+		try {
+			keyPairs.deriveKeypair(privateKey);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
 }
 
 XRPWallet.Tx = Wallet.Tx;

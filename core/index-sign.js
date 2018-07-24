@@ -65,7 +65,8 @@ let API_ROUTES = {
 
 		'/api/sign': async ctx => {
 			ctx.validateParam('wallet').check(wallet && wallet.status === Wallet.Status.Ready, 'Wallet is not ready yet, please try again later');
-			ctx.validateBody('privateKeys').required('is required').isArray('must be an array').isLength(1, 1, 'must have 1 private key');
+			ctx.validateBody('privateKeys').required('is required').isArray('must be an array').isLength(1, 1, 'must have 1 private key')
+				.check(ctx.vals.privateKeys.every(k => wallet.validatePrivateKeyFormat(k)), "must conform private key format");
 			ctx.validateBody('transactionContext').required('is required').isTransactionContext();
 
 			// DW => HW

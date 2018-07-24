@@ -250,6 +250,15 @@ class Wallet {
 	validatePrivateKey(/* privateKey */) {
 		return true;
 	}
+
+	/**
+	 * Checks if private key is of correct format
+	 * 
+	 * @param {String} privateKey	Private key
+	 */
+	validatePrivateKeyFormat(/* privateKey */) {
+		return true;
+	}
 }
 
 /**
