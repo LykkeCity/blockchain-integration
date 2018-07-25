@@ -44,8 +44,8 @@ class MongoStore {
 				let indexesExist = await this.Transactions.indexExists('hash').catch(() => {});
 				if (!indexesExist) {
 					await this.Transactions.createIndexes([
-						{key: {hash: 1}, name: 'hash', unique: true, partialFilterExpression: {hash: {$exists: true, $type: 'string'}}},
-						{key: {opid: 1}, name: 'opid', unique: true, partialFilterExpression: {opid: {$exists: true, $type: 'string'}}},
+						{key: {hash: 1}, name: 'hash', unique: true /*, partialFilterExpression: {hash: {$exists: true, $type: 'string'}}*/},
+						{key: {opid: 1}, name: 'opid', unique: true /*, partialFilterExpression: {opid: {$exists: true, $type: 'string'}}*/},
 					]);
 
 					await this.Accounts.createIndexes([
