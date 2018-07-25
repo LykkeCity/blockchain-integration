@@ -5,6 +5,7 @@ const RippleAPI = require('ripple-lib').RippleAPI,
 	codec = require('ripple-address-codec'),
 	Big = require('big.js'),
 	crypto = require('crypto'),
+	keyPairs = require('./node_modules/ripple-keypairs/distrib/npm/index.js'),
 	PRECISION = 1e6,
 	// PRECISION_ASSET = 1e16,
 	DECIMALS = 6,
@@ -584,6 +585,27 @@ class XRPWallet extends Wallet {
 			seed: info.account.secret,
 			balance: info.balance
 		};
+	}
+
+	validatePrivateKey(privateKey) {
+		try {	
+			const pair = keyPairs.deriveKeypair(privateKey);
+			const addr = keyPairs.deriveAddress(pair.publicKey);
+
+			return addr === this.address();
+		}
+		catch (e) {
+			return false;
+		}
+	}
+
+	validatePrivateKeyFormat(privateKey) {
+		try {
+			keyPairs.deriveKeypair(privateKey);
+			return true;
+		} catch (e) {
+			return false;
+		}
 	}
 }
 
