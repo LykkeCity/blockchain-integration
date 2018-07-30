@@ -140,7 +140,9 @@ module.exports.setUpHTTP = (serviceName, url) => {
 					logLevel: levelMap[info.level],
 					component: info.label,
 					message: info.message,
-					additionalSlackChannels: ['warn', 'error', 'fatal', 'monitor'].indexOf(info.level) !== -1 ? ['BlockChainIntegrationImportantMessages', 'BlockChainIntegration'] : ['BlockChainIntegration']
+					additionalSlackChannels: ['warn', 'error', 'fatal', 'monitor'].indexOf(info.level) !== -1 ? ['BlockChainIntegrationImportantMessages', 'BlockChainIntegration'] : ['BlockChainIntegration'],
+					exceptionType: info.error && info.error.name,
+					callstack: info.error && info.error.stack
 				};
 
 				console.log(data);
