@@ -319,7 +319,8 @@ let findTx = async (ctx) => {
 			fee: (tx.fees || 0) + '',
 			hash: tx.hash,
 			block: tx.block || undefined,
-			error: tx.error || undefined
+			error: tx.error || undefined,
+			errorCode: tx.errorCode
 		};
 		
 		if (tx.error) {
@@ -840,6 +841,7 @@ let API_ROUTES = {
 					// mark tx as completed right away
 					await ctx.store.tx(tx._id, {hash: '' + Date.now(), status: Wallet.Tx.Status.Completed, timestamp: Date.now(), observing: true, block: tx.block, page: tx.page}, false);
 					log.info(`Successfully completed dwhw tx ${ctx.vals.operationId} with block ${tx.block}`);
+					ctx.status = 200;
 				} else {
 					// common cash-out
 					let result = await SRV.wallet.submitSignedTransaction(ctx.request.body.signedTransaction),
@@ -853,6 +855,8 @@ let API_ROUTES = {
 						log.warn('Sync of wallets required');
 						syncRequired = true;
 					}
+
+					const retryMessage = 'Please retry transaction later';
 
 					if (result.hash) {
 						// got a hash = tx has been submitted to blockchain
@@ -869,6 +873,7 @@ let API_ROUTES = {
 						} else {
 							log.error(`Couldn't update tx ${ctx.vals.operationId} with update status, please restart server for tx to update it's status: ${result}`);
 						}
+						ctx.status = 200;
 					} else if (result.error) {
 						// error when submitting
 						log.warn(result.error, `Error submitting tx ${ctx.vals.operationId}`);
@@ -887,7 +892,8 @@ let API_ROUTES = {
 						}
 
 						await ctx.store.tx(tx._id, {
-							error: errorCode, 
+							errorCode: errorCode,
+							error: result.error.message || retryMessage,
 							status: Wallet.Tx.Status.Failed, 
 							timestamp: Date.now(), 
 							observing: true
@@ -896,13 +902,13 @@ let API_ROUTES = {
 						ctx.status = 400;
 						ctx.body = {
 							errorCode: errorCode,
-							errorMessage: result.error.message || 'Please retry transaction later'
+							errorMessage: result.error.message || retryMessage
 						};
 					} else if (result.status) {
 						ctx.status = 400;
 						ctx.body = {
 							errorCode: 'buildingShouldBeRepeated',
-							errorMessage: result.error || 'Please retry transaction later'
+							errorMessage: result.error || retryMessage
 						};
 					} else {
 						throw new Wallet.Error(Wallet.Errors.EXCEPTION, 'neither hash, nor error returned by submitSignedTransaction');
@@ -943,9 +949,6 @@ let API_ROUTES = {
 						}
 					}
 				}
-
-				ctx.status = 200;
-				ctx.body = ctx.body || {};
 			} else {
 				ctx.status = 409;
 			}
