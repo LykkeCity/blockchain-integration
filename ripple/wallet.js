@@ -202,7 +202,8 @@ class XRPWallet extends Wallet {
 			let [address, memo] = str.split(XRPWallet.SEPARATOR);
 			if (address) {
 				try {
-					if (codec.isValidAddress(address) && (!memo || (('' + parseInt(memo)) === ('' + memo)))) {
+					const memoVal = parseInt(memo);
+					if (codec.isValidAddress(address) && (!memo || (!isNaN(memo) && ('' + memoVal) === ('' + memo) && memoVal >= 0 && memoVal <= 4294967295))) {
 						return {
 							address: address,
 							paymentId: memo
