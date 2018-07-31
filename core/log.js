@@ -147,9 +147,9 @@ module.exports.setUpHTTP = (serviceName, url) => {
 
 				console.log(data);
 
-				this.transport.retriableRequest(null, 'POST', data).then(callback.bind(null, null), callback);
+				this.transport.retriableRequest(null, 'POST', data); // fire and forget
 
-				// setImmediate(callback);
+				return callback();
 			} catch(e) {
 				console.log(e);
 			}
