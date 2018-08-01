@@ -25,10 +25,10 @@ class XRPWallet extends Wallet {
 		});
 
 		// last known (from transactions in db) validated ledger version
-		this.height = parseInt(page) || 0;
+		this.height = parseInt(page || 0);
  
 		// by default expires in 400 closed ledgers (kinda "blocks")
-		this.expiration = parseInt(expiration) || 400;
+		this.expiration = parseInt(expiration || 400);
 	}
 
 	/**
