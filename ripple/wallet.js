@@ -110,20 +110,22 @@ class XRPWallet extends Wallet {
 			// this.height = await this.api.getLedgerVersion();
 
 			let info = await this.api.getAccountInfo(this.account);
-			this.sequence = info.sequence;
+			if (this.sequence < info.sequence) {
+				this.sequence = info.sequence;
+			}
 
 			await this.balances();
 
 		} catch (e) {
 			this.log.error(e, 'Error in refresh');
 		} finally {
-			this.refreshTimeout = setTimeout(this.refresh.bind(this), this.refreshEach);
-			this.refreshing = false;
-			this.log.info(`Refreshing done (${this.height}), ${Object.keys(this.pending).length} pending tx.`);
 			Object.keys(this.pending).forEach(hash => {
 				this.log.info(`_onTx'ing tx ${hash}`);
 				this._onTx(hash);
 			});
+			this.log.info(`Refreshing done (${this.height}), ${Object.keys(this.pending).length} pending tx.`);
+			this.refreshTimeout = setTimeout(this.refresh.bind(this), this.refreshEach);
+			this.refreshing = false;
 		}
 	}
 
@@ -309,7 +311,7 @@ class XRPWallet extends Wallet {
 						},
 					},
 				},
-				instructions = {maxLedgerVersion: height + 400, sequence: this.sequence++};
+				instructions = {maxLedgerVersion: height + 400, sequence: this.sequence};
 
 			if (tx.bounce) {
 				let feeString = await this.api.getFee(),
@@ -435,6 +437,7 @@ class XRPWallet extends Wallet {
 
 			if (result.resultCode === 'tesSUCCESS' || result.resultCode === 'terQUEUED') {
 				// this.log.debug(`tx right after submission ${JSON.stringify(await this.api.getTransaction(id))}`);
+				this.sequence++;
 				return {_id: _id, hash: id};
 			// } else if (result.resultCode.indexOf('tel') === 0 || result.resultCode.indexOf('tem') === 0) {
 			} else if (result.resultCode === 'tecNO_DST') {
