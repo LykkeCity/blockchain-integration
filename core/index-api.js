@@ -1200,7 +1200,7 @@ const index = (settings, routes, WalletClass) => {
 
 		// view wallet initialization
 		SRV.resetWallet = (address, view) => {
-			SRV.wallet = new Wallet(CFG.testnet, CFG.node, SRV.log('view-wallet'), onTxCallback, CFG.refreshEach, pending, last.length && last[0].page);
+			SRV.wallet = new Wallet(CFG.testnet, CFG.node, SRV.log('view-wallet'), onTxCallback, CFG.refreshEach, pending, last.length && last[0].page, CFG.expiration);
 			return SRV.wallet.initViewWallet(address || process.env.WalletAddress || CFG.WalletAddress, view || process.env.WalletViewKey || CFG.WalletViewKey);
 		};
 		if ((CFG.WalletAddress && (!Wallet.VIEWKEY_NEEDED || CFG.WalletViewKey)) ||

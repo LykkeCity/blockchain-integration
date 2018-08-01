@@ -13,7 +13,7 @@ const RippleAPI = require('ripple-lib').RippleAPI,
 	RESERVE = 20;
 
 class XRPWallet extends Wallet {
-	constructor(testnet, node, logger, onTx, refreshEach, pending, page) {
+	constructor(testnet, node, logger, onTx, refreshEach, pending, page, expiration) {
 		super(testnet, node, logger, onTx, refreshEach);
 		
 		// hash of transactions being watched (statuses are updated on each refresh, callback is called each status update)
@@ -25,7 +25,10 @@ class XRPWallet extends Wallet {
 		});
 
 		// last known (from transactions in db) validated ledger version
-		this.height = parseInt(page || 0);
+		this.height = parseInt(page) || 0;
+ 
+		// by default expires in 400 closed ledgers (kinda "blocks")
+		this.expiration = parseInt(expiration) || 400;
 	}
 
 	/**
@@ -308,7 +311,7 @@ class XRPWallet extends Wallet {
 						},
 					},
 				},
-				instructions = {maxLedgerVersion: height + 400, sequence: this.sequence++};
+				instructions = {maxLedgerVersion: height + this.expiration, sequence: this.sequence++};
 
 			if (tx.bounce) {
 				let feeString = await this.api.getFee(),
