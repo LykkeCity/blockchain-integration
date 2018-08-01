@@ -72,14 +72,18 @@ const index = (settings, routes={}) => {
 			app.use(async (ctx, next) => {
 				ctx.store = srv.store;
 				ctx.CFG = srv.CFG;
-
-				L.info(`request ${ctx.method} ${ctx.path}`);
-				L.debug(`query ${JSON.stringify(ctx.query)} qs ${ctx.querystring} body ${JSON.stringify(ctx.request.body)} params ${JSON.stringify(ctx.params)}`);
+				const isIsAlive = ctx.path.toLowerCase().indexOf("api/isalive") >= 0;
+				if (!isIsAlive) {
+					L.info(`request: ${ctx.method} ${ctx.path}`);
+					L.debug(`query: ${JSON.stringify(ctx.query)}, qs: ${ctx.querystring}, body: ${JSON.stringify(ctx.request.body)}, params: ${JSON.stringify(ctx.params)}`);
+				}
 				const start = Date.now();
 				await next();
 				const ms = Date.now() - start;
 				ctx.set('X-Response-Time', `${ms}ms`);
-				L.info(`request ${ctx.path} done with ${ctx.status} in ${ms}ms`);
+				if (!isIsAlive) {
+					L.info(`request ${ctx.path} done with ${ctx.status} in ${ms}ms`);
+				}
 				if (ctx.status === 400) {
 					L.info(`response ${JSON.stringify(ctx.body)}`);
 				}

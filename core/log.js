@@ -47,9 +47,7 @@ module.exports = label => {
 		level: currentLevel,
 		format: labelledFormat,
 		levels: levels.levels,
-		transports: [
-			new winston.transports.File({ filename: CFG ? `${CFG.chain}-error.log` : 'default-error.log', level: 'error' })
-		]
+		transports: []
 	});
 
 	winston.addColors(levels);
@@ -131,7 +129,6 @@ module.exports.setUpHTTP = (serviceName, url) => {
 				if (info.label === 'transport') {
 					return callback();
 				}
-				// console.log(info);
 
 				let data = {
 					appName: serviceName,
