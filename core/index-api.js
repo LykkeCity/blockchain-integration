@@ -297,7 +297,7 @@ let findTx = async (ctx) => {
 	let tx = await ctx.store.tx({opid: ctx.vals.operationId, observing: true, bounce: {$exists: false}});
 
 	if (tx && tx.status !== Wallet.Tx.Status.Initial) {
-		log.info(`Found tx ${ctx.vals.operationId}`);
+		log.debug(`Found tx ${ctx.vals.operationId}`);
 		tx = Wallet.Tx.fromJSON(tx);
 		
 		let status = 'inProgress';
@@ -560,7 +560,7 @@ let API_ROUTES = {
 			
 			let decoded = SRV.Wallet.addressDecode(ctx.vals.address, CFG.testnet);
 
-			log.info(`Address ${ctx.vals.address} is ${decoded ? 'valid' : 'invalid'}`);
+			log.debug(`Address ${ctx.vals.address} is ${decoded ? 'valid' : 'invalid'}`);
 			
 			ctx.body = {
 				isValid: !!decoded
@@ -590,7 +590,7 @@ let API_ROUTES = {
 
 			offset = data.length === limit ? '' + (offset + limit) : null;
 
-			log.info(`Found ${balances.length} for take ${ctx.vals.take} & continuation ${ctx.vals.continuation}; next continuation ${offset}`);
+			log.debug(`Found ${balances.length} for take ${ctx.vals.take} & continuation ${ctx.vals.continuation}; next continuation ${offset}`);
 
 			ctx.body = {
 				continuation: offset,
