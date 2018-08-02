@@ -159,6 +159,10 @@ const index = (settings, routes={}) => {
 			app.use(router.routes())
 				.use(router.allowedMethods());
 
+			app.on('error', err => {
+				L.error(err, 'Generic app error');
+			});
+
 			L.info(`Starting server on ${CFG.port}`);
 			let server = app.listen(CFG.port);
 			if (CFG.socketTimeout) {
