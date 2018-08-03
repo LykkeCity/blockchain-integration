@@ -293,6 +293,11 @@ class XRPWallet extends Wallet {
 				return {error: new Wallet.Error(Wallet.Errors.NOT_ENOUGH_FUNDS)};
 			}
 
+			let info = await this.api.getAccountInfo(this.account);
+			if (this.sequence < info.sequence) {
+				this.sequence = info.sequence;
+			}
+
 			let op = tx.operations[0],
 				spec = {
 					source: {
