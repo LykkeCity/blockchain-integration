@@ -322,10 +322,6 @@ let findTx = async (ctx) => {
 			error: tx.error || undefined,
 			errorCode: tx.errorCode
 		};
-		
-		if (tx.error) {
-			ctx.body.errorCode = 'unknown';
-		}
 	} else {
 		log.warn(`Didn't find tx ${ctx.vals.operationId}`);
 		log.debug(`Found ${tx}`);
@@ -352,7 +348,7 @@ let onTxCallback = async info => {
 
 		// just failing tx out
 		if (info.status === Wallet.Tx.Status.Failed) {
-			return await SRV.store.tx({hash: info.hash}, {status: info.status}, false);
+			return await SRV.store.tx({hash: info.hash}, {status: info.status, error: info.error, errorCode: info.errorCode || 'unknown'}, false);
 		}
 
 		// just update status if it exists
