@@ -125,11 +125,11 @@ module.exports.setUpHTTP = (serviceName, url) => {
 		}
 
 		log (info, callback) {
-			try {
-				if (info.label === 'transport') {
-					return callback();
-				}
+			if (info.label === 'transport') {
+				return callback(); // skip logging from transport itself to prevent recursion
+			}
 
+			try {
 				let data = {
 					appName: serviceName,
 					appVersion: '1.0.0',
@@ -142,13 +142,11 @@ module.exports.setUpHTTP = (serviceName, url) => {
 					callstack: info.error && info.error.stack
 				};
 
-				console.log(data);
-
-				this.transport.retriableRequest(null, 'POST', data); // fire and forget
-
-				return callback();
+				await this.transport.retriableRequest(null, 'POST', data);
 			} catch(e) {
 				console.log(e);
+			} finally {
+				return callback();
 			}
 		}
 	}
