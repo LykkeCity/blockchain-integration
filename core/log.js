@@ -129,25 +129,21 @@ module.exports.setUpHTTP = (serviceName, url) => {
 				return callback(); // skip logging from transport itself to prevent recursion
 			}
 
-			try {
-				let data = {
-					appName: serviceName,
-					appVersion: '1.0.0',
-					envInfo: process.env.ENV_INFO || null,
-					logLevel: levelMap[info.level],
-					component: info.label,
-					message: info.message,
-					additionalSlackChannels: ['warn', 'error', 'fatal', 'monitor'].indexOf(info.level) !== -1 ? ['BlockChainIntegrationImportantMessages', 'BlockChainIntegration'] : ['BlockChainIntegration'],
-					exceptionType: info.error && info.error.name,
-					callstack: info.error && info.error.stack
-				};
+			let data = {
+				appName: serviceName,
+				appVersion: '1.0.0',
+				envInfo: process.env.ENV_INFO || null,
+				logLevel: levelMap[info.level],
+				component: info.label,
+				message: info.message,
+				additionalSlackChannels: ['warn', 'error', 'fatal', 'monitor'].indexOf(info.level) !== -1 ? ['BlockChainIntegrationImportantMessages', 'BlockChainIntegration'] : ['BlockChainIntegration'],
+				exceptionType: info.error && info.error.name,
+				callstack: info.error && info.error.stack
+			};
 
-				await this.transport.retriableRequest(null, 'POST', data);
-			} catch(e) {
-				console.log(e);
-			} finally {
-				return callback();
-			}
+			return this.transport.retriableRequest(null, 'POST', data)
+				.catch(e => console.log(e))
+				.finally(callback);
 		}
 	}
 
