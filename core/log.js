@@ -124,7 +124,7 @@ module.exports.setUpHTTP = (serviceName, url) => {
 			}, conf: {timeout: 15000, headers: {accept: 'application/json'}}});
 		}
 
-		log (info, callback) {
+		async log (info, callback) {
 			if (info.label === 'transport') {
 				return callback(); // skip logging from transport itself to prevent recursion
 			}
@@ -138,12 +138,16 @@ module.exports.setUpHTTP = (serviceName, url) => {
 				message: info.message,
 				additionalSlackChannels: ['warn', 'error', 'fatal', 'monitor'].indexOf(info.level) !== -1 ? ['BlockChainIntegrationImportantMessages', 'BlockChainIntegration'] : ['BlockChainIntegration'],
 				exceptionType: info.error && info.error.name,
-				callstack: info.error && info.error.stack
+				callStack: info.error && info.error.stack
 			};
 
-			return this.transport.retriableRequest(null, 'POST', data)
-				.catch(e => console.log(e))
-				.finally(callback);
+			try {
+				await this.transport.retriableRequest(null, 'POST', data);
+			} catch (e) {
+				console.log(e);
+			} finally {
+				return callback(); 
+			}
 		}
 	}
 
