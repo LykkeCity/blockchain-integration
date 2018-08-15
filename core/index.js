@@ -63,26 +63,18 @@ const index = (settings, routes={}) => {
 				process.exit(1);
 			}
 
-			app.use(bouncer.middleware());
-
-			app.use(koaBody({
-				jsonLimit: '10000kb'
-			}));
-
 			app.use(async (ctx, next) => {
 				ctx.store = srv.store;
 				ctx.CFG = srv.CFG;
-
-				L.info(`request ${ctx.method} ${ctx.path}`);
-				L.debug(`query ${JSON.stringify(ctx.query)} qs ${ctx.querystring} body ${JSON.stringify(ctx.request.body)} params ${JSON.stringify(ctx.params)}`);
 				const start = Date.now();
+				L.debug(`request ${ctx.method} ${ctx.path}`);
 				await next();
+				if (ctx.status >= 400) {
+					L.warn(`response ${JSON.stringify(ctx.body)}`);
+				}
 				const ms = Date.now() - start;
 				ctx.set('X-Response-Time', `${ms}ms`);
-				L.info(`request ${ctx.path} done with ${ctx.status} in ${ms}ms`);
-				if (ctx.status === 400) {
-					L.info(`response ${JSON.stringify(ctx.body)}`);
-				}
+				L.debug(`request ${ctx.path} done with ${ctx.status} in ${ms}ms`);
 			});
 
 			app.use(async (ctx, next) => {
@@ -138,6 +130,18 @@ const index = (settings, routes={}) => {
 				}
 			});
 
+			app.use(bouncer.middleware());
+
+			app.use(koaBody({
+				jsonLimit: '10000kb'
+			}));
+
+			app.use(async (ctx, next) => {
+				L.debug(`query: ${JSON.stringify(ctx.query)}, qs: ${ctx.querystring}, body: ${JSON.stringify(ctx.request.body)}, params: ${JSON.stringify(ctx.params)}`);
+				await next();
+			});
+
+
 			router.get('/', ctx => {
 				ctx.body = `Lykke ${CFG.chain} server`;
 				ctx.status = 200;
@@ -154,6 +158,10 @@ const index = (settings, routes={}) => {
 
 			app.use(router.routes())
 				.use(router.allowedMethods());
+
+			app.on('error', err => {
+				L.error(err, 'Generic app error');
+			});
 
 			L.info(`Starting server on ${CFG.port}`);
 			let server = app.listen(CFG.port);

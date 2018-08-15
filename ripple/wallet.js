@@ -202,7 +202,8 @@ class XRPWallet extends Wallet {
 			let [address, memo] = str.split(XRPWallet.SEPARATOR);
 			if (address) {
 				try {
-					if (codec.isValidAddress(address) && (!memo || (('' + parseInt(memo)) === ('' + memo)))) {
+					const memoVal = parseInt(memo);
+					if (codec.isValidAddress(address) && (!memo || (!isNaN(memo) && ('' + memoVal) === ('' + memo) && memoVal >= 0 && memoVal <= 4294967295))) {
 						return {
 							address: address,
 							paymentId: memo
@@ -290,6 +291,8 @@ class XRPWallet extends Wallet {
 				return {error: new Wallet.Error(Wallet.Errors.NOT_ENOUGH_FUNDS)};
 			}
 
+			let seq = (await this.api.getAccountInfo(this.account)).sequence;
+
 			let op = tx.operations[0],
 				spec = {
 					source: {
@@ -308,7 +311,7 @@ class XRPWallet extends Wallet {
 						},
 					},
 				},
-				instructions = {maxLedgerVersion: height + 400, sequence: this.sequence++};
+				instructions = {maxLedgerVersion: height + 400, sequence: seq};
 
 			if (tx.bounce) {
 				let feeString = await this.api.getFee(),

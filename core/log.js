@@ -47,9 +47,7 @@ module.exports = label => {
 		level: currentLevel,
 		format: labelledFormat,
 		levels: levels.levels,
-		transports: [
-			new winston.transports.File({ filename: CFG ? `${CFG.chain}-error.log` : 'default-error.log', level: 'error' })
-		]
+		transports: []
 	});
 
 	winston.addColors(levels);
@@ -126,30 +124,29 @@ module.exports.setUpHTTP = (serviceName, url) => {
 			}, conf: {timeout: 15000, headers: {accept: 'application/json'}}});
 		}
 
-		log (info, callback) {
+		async log (info, callback) {
+			if (info.label === 'transport') {
+				return callback(); // skip logging from transport itself to prevent recursion
+			}
+
+			let data = {
+				appName: serviceName,
+				appVersion: '1.0.0',
+				envInfo: process.env.ENV_INFO || null,
+				logLevel: levelMap[info.level],
+				component: info.label,
+				message: info.message,
+				additionalSlackChannels: ['warn', 'error', 'fatal', 'monitor'].indexOf(info.level) !== -1 ? ['BlockChainIntegrationImportantMessages', 'BlockChainIntegration'] : ['BlockChainIntegration'],
+				exceptionType: info.error && info.error.name,
+				callStack: info.error && info.error.stack
+			};
+
 			try {
-				if (info.label === 'transport') {
-					return callback();
-				}
-				// console.log(info);
-
-				let data = {
-					appName: serviceName,
-					appVersion: '1.0.0',
-					envInfo: process.env.ENV_INFO || null,
-					logLevel: levelMap[info.level],
-					component: info.label,
-					message: info.message,
-					additionalSlackChannels: ['warn', 'error', 'fatal', 'monitor'].indexOf(info.level) !== -1 ? ['BlockChainIntegrationImportantMessages', 'BlockChainIntegration'] : ['BlockChainIntegration']
-				};
-
-				console.log(data);
-
-				this.transport.retriableRequest(null, 'POST', data).then(callback.bind(null, null), callback);
-
-				// setImmediate(callback);
-			} catch(e) {
+				await this.transport.retriableRequest(null, 'POST', data);
+			} catch (e) {
 				console.log(e);
+			} finally {
+				return callback(); 
 			}
 		}
 	}
