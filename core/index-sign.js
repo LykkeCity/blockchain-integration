@@ -128,7 +128,7 @@ const index = (settings, routes, WalletClass) => {
 	putAll(API_ROUTES);
 	putAll(routes);
 
-	return require('./index.js')(settings, merged).then(server => {
+	return require('./index.js')(settings, merged, true).then(server => {
 		// here we already have config, db is not needed for sign service
 		SRV = server;
 		CFG = SRV.CFG;

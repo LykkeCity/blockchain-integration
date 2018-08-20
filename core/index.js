@@ -2,8 +2,8 @@
 
 const GUID = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$', 'i');
 
-const index = (settings, routes={}) => {
-	const log = require('../core/log.js'),
+const index = (settings, routes={}, logNull) => {
+	const log = logNull ? require("./log-null") : require('./log.js'),
 		L = log('index');
 
 	return new Promise(resolve => {
@@ -35,7 +35,7 @@ const index = (settings, routes={}) => {
 				setTimeout(process.exit.bind(process, 1), 1000);
 			}); 
 
-			let srv = {CFG: CFG, log: require('./log.js')};
+			let srv = {CFG: CFG, log: log};
 			srv.log.setLevel(CFG.log);
 
 			if ('store' in CFG) {
