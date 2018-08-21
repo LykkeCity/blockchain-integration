@@ -120,6 +120,7 @@ Tx.fromJSON = data => {
 	if (data.page !== undefined) { tx.page = data.page; }
 	if (data.timestamp !== undefined) { tx.timestamp = data.timestamp; }
 	if (data.error !== undefined) { tx.error = data.error; }
+	if (data.errorCode !== undefined) { tx.errorCode = data.errorCode; }
 	if (data.status !== undefined) { tx.status = data.status; }
 
 	return tx;
