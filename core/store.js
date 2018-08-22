@@ -29,7 +29,7 @@ class MongoStore {
 		}
 
 		this.log.info(`Connecting in store: ${this.CFG.store}`);
-		this.connectPromise = MongoClient.connect(this.CFG.store, {connectTimeoutMS: 3000, socketTimeoutMS: 3000})
+		this.connectPromise = MongoClient.connect(this.CFG.store, {connectTimeoutMS: 10000, socketTimeoutMS: 10000})
 			.then(async client => {
 				this.connected = true;
 				this.connectionErrors = 0;
@@ -41,7 +41,7 @@ class MongoStore {
 				this.Accounts = this.db.collection('accounts');
 				this.Transactions = this.db.collection('transactions');
 
-				let indexesExist = await this.Transactions.indexExists('hash').catch(() => {});
+				let indexesExist = await this.Transactions.indexExists('hash');
 				if (!indexesExist) {
 					await this.Transactions.createIndexes([
 						{key: {hash: 1}, name: 'hash', unique: true /*, partialFilterExpression: {hash: {$exists: true, $type: 'string'}}*/},

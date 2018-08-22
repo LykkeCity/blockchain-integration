@@ -46,7 +46,7 @@ class HttpTransport {
 				conf.body = JSON.stringify(params);
 			}
 		}
-		log.debug(`Sending ${method} to ${path}`);
+		log.debug(`Sending ${method} to ${conf.url}`);
 		log.debug(`params: ${JSON.stringify(params)}`);
 		return new Promise((resolve, reject) => {
 			request(conf, (err, res, body) => {
