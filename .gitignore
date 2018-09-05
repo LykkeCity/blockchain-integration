@@ -65,3 +65,6 @@ appSettings.*.json
 
 # Build artifacts
 build
+
+# JetBrains
+.idea
