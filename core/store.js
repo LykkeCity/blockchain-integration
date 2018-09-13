@@ -207,7 +207,7 @@ class MongoStore {
 			data._id = res.insertedId;
 			return data;
 		} catch (e) {
-			this.log.error(e, `Error in INSERT into ${collection.s.name}`);
+			this.log.warn(e, `Error on INSERT into ${collection.s.name}`);
 			return 0;
 		}
 	}
