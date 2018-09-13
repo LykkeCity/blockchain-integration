@@ -581,8 +581,9 @@ let API_ROUTES = {
 				limit = ctx.vals.take;
 
 			let data = await ctx.store.accountFind({balance: {$gt: 0}}, {}, offset, limit, {_id: 1}),
+				block = await SRV.wallet.currentBlock(),
 				balances = data.map(o => {
-					return {address: o._id, assetId: CFG.assetId, balance: '' + o.balance, block: o.block || undefined};
+					return {address: o._id, assetId: CFG.assetId, balance: '' + o.balance, block: Math.max(o.block, block)};
 				});
 
 			offset = data.length === limit ? '' + (offset + limit) : null;
