@@ -45,7 +45,7 @@ class MongoStore {
 				if (!indexesExist) {
 					await this.Transactions.createIndexes([
 						{key: {hash: 1}, name: 'hash', unique: true /*, partialFilterExpression: {hash: {$exists: true, $type: 'string'}}*/},
-						{key: {opid: 1}, name: 'opid' /*, unique: true, partialFilterExpression: {opid: {$exists: true, $type: 'string'}}*/},
+						{key: {opid: 1}, name: 'opid', unique: true /*, partialFilterExpression: {opid: {$exists: true, $type: 'string'}}*/},
 					]);
 
 					await this.Accounts.createIndexes([
@@ -140,6 +140,11 @@ class MongoStore {
 	}
 
 	txCreate (data) {
+		// CosmosDB does not support sparse unique indexes.
+		// Use simple unique indexes and fill indexed fields with unique values then.
+		if (!!data.opid && !data.hash) { data.hash = data.opid; } // will be replaced with real hash after broadcast
+		if (!!data.hash && !data.opid) { data.opid = data.hash; } // indicates external transactions
+
 		return this.create(this.Transactions, data);
 	}
 
