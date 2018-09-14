@@ -19,7 +19,7 @@ class XRPWallet extends Wallet {
 		// hash of transactions being watched (statuses are updated on each refresh, callback is called each status update)
 		this.pending = {};
 		(pending || []).forEach(tx => {
-			if (tx.hash) {
+			if (tx.hash && tx.hash != tx.opid) {
 				this.pending[tx.hash] = tx.status;
 			}
 		});
