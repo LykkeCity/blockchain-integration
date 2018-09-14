@@ -113,7 +113,9 @@ class XRPWallet extends Wallet {
 			// this.height = await this.api.getLedgerVersion();
 
 			let info = await this.api.getAccountInfo(this.account);
-			this.sequence = info.sequence;
+			if (info.sequence > this.sequence) {
+				this.sequence = info.sequence;
+			}
 
 			await this.balances();
 
@@ -294,7 +296,6 @@ class XRPWallet extends Wallet {
 				return {error: new Wallet.Error(Wallet.Errors.NOT_ENOUGH_FUNDS)};
 			}
 
-			let seq = (await this.api.getAccountInfo(this.account)).sequence;
 
 			let op = tx.operations[0],
 				spec = {
@@ -314,7 +315,7 @@ class XRPWallet extends Wallet {
 						},
 					},
 				},
-				instructions = {maxLedgerVersion: height + this.expiration, sequence: seq};
+				instructions = {maxLedgerVersion: height + this.expiration, sequence: this.sequence++};
 
 			if (tx.bounce) {
 				let feeString = await this.api.getFee(),
@@ -449,6 +450,10 @@ class XRPWallet extends Wallet {
 			// } else if (result.resultCode === 'tefPAST_SEQ') {
 			// 	return {_id: _id, error: new Wallet.Error(Wallet.Errors.NOT_ENOUGH_FUNDS)};
 			} else {
+				if (result.resultCode === 'tefPAST_SEQ' || result.resultCode === 'terPRE_SEQ') {
+					const info = await this.api.getAccountInfo(this.account);
+					this.sequence = info.sequence;
+				}
 				return {_id: _id, error: new Wallet.Error(Wallet.Errors.EXCEPTION, result.resultCode)};
 			}
 		} catch (e) {
