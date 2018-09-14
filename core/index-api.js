@@ -1187,7 +1187,7 @@ const index = (settings, routes, WalletClass) => {
 		Wallet = SRV.Wallet = WalletClass;
 
 		// find all pending transactions so wallet could refresh their status
-		let pending = await SRV.store.txFind({status: {$in: [Wallet.Tx.Status.Initial, Wallet.Tx.Status.Sent, Wallet.Tx.Status.Locked]}}, {hash: 1, status: 1});
+		let pending = await SRV.store.txFind({status: {$in: [Wallet.Tx.Status.Initial, Wallet.Tx.Status.Sent, Wallet.Tx.Status.Locked]}}, {hash: 1, status: 1, opid: 1});
 		log.info(`${pending && pending.length} pending transactions`);
 		log.debug(`pending: ${JSON.stringify(pending)}`);
 		
