@@ -499,7 +499,8 @@ let API_ROUTES = {
 				ctx.body = {
 					publicAddressExtension: {
 						separator: Wallet.SEPARATOR,
-						displayName: Wallet.EXTENSION_NAME
+						displayName: Wallet.EXTENSION_NAME,
+						baseDisplayName: null
 					}
 				};
 			} else {
