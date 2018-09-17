@@ -28,7 +28,6 @@ class MongoStore {
 			this.close();
 		}
 
-		this.log.info(`Connecting in store: ${this.CFG.store}`);
 		this.connectPromise = MongoClient.connect(this.CFG.store, {connectTimeoutMS: 10000, socketTimeoutMS: 10000})
 			.then(async client => {
 				this.connected = true;
@@ -58,7 +57,7 @@ class MongoStore {
 				if (!this.connected) {
 					this.connectionErrors++;
 				}
-				this.log.error(err, 'Error in store');
+				this.log.error('Error connecting to store');
 
 				if (this.connectionErrors < 3) {
 					return this.reconnect();
