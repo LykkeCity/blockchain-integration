@@ -628,7 +628,7 @@ XRPWallet.Account = Wallet.Account;
 XRPWallet.Tx = Wallet.Tx;
 XRPWallet.SEPARATOR = '+';
 XRPWallet.ENCODING_SEPARATOR = '$';
-XRPWallet.EXTENSION_NAME = 'tag';
+XRPWallet.EXTENSION_NAME = 'Tag';
 XRPWallet.PRIVATE_KEY_NEEDED = false;
 
 module.exports = XRPWallet;
