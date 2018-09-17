@@ -296,7 +296,7 @@ class XRPWallet extends Wallet {
 				return {error: new Wallet.Error(Wallet.Errors.NOT_ENOUGH_FUNDS)};
 			}
 
-
+			tx.sequence = this.sequence++;
 			let op = tx.operations[0],
 				spec = {
 					source: {
@@ -315,7 +315,7 @@ class XRPWallet extends Wallet {
 						},
 					},
 				},
-				instructions = {maxLedgerVersion: height + this.expiration, sequence: this.sequence++};
+				instructions = {maxLedgerVersion: height + this.expiration, sequence: tx.sequence};
 
 			if (tx.bounce) {
 				let feeString = await this.api.getFee(),
