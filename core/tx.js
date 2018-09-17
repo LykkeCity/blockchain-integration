@@ -77,6 +77,7 @@ class Tx {
 			timestamp: this.timestamp,
 			error: this.error,
 			status: this.status,
+			sequence: this.sequence
 		};
 		if (this.bounce !== undefined) {
 			o.bounce = this.bounce;
@@ -122,6 +123,7 @@ Tx.fromJSON = data => {
 	if (data.error !== undefined) { tx.error = data.error; }
 	if (data.errorCode !== undefined) { tx.errorCode = data.errorCode; }
 	if (data.status !== undefined) { tx.status = data.status; }
+	if (data.sequence !== undefined) { tx.sequence = data.sequence; }
 
 	return tx;
 };
