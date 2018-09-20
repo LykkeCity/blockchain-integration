@@ -5,6 +5,19 @@ const GUID = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f
 const index = (settings, routes={}, logNull) => {
 	const log = logNull ? require("./log-null") : require('./log.js'),
 		L = log('index');
+	
+	const appInsights = require("applicationinsights");
+	if (!!process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
+		appInsights.setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
+			.setAutoDependencyCorrelation(true)
+			.setAutoCollectRequests(true)
+			.setAutoCollectPerformance(true)
+			.setAutoCollectExceptions(true)
+			.setAutoCollectDependencies(true)
+			.setAutoCollectConsole(true)
+			.setUseDiskRetryCaching(true)
+			.start();
+	}
 
 	return new Promise(resolve => {
 		L.monitor('Starting up');
