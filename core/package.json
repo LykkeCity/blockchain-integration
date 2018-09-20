@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/iartem/lykke-core#readme",
   "dependencies": {
+    "applicationinsights": "^1.0.4",
     "koa": "^2.4.1",
     "koa-body": "^2.5.0",
     "koa-bouncer": "^6.0.4",
